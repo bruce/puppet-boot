@@ -9,6 +9,9 @@ Puppet::Type.type(:boot).provide(:grubby) do
     if @resource.value(:initrd)
       options.push('--initrd', @resource.value(:initrd))
     end
+    if @resource.value(:configfile)
+      options.push('--config-file', @resource.value(:configfile))
+    end
     grubby(*options)
   end
 
