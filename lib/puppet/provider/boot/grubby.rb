@@ -4,13 +4,15 @@ Puppet::Type.type(:boot).provide(:grubby) do
   
   def create
     options = ['--add-kernel', @resource.value(:kernel),
-               '--title', @resource.value(:name),
-               '--args', @resource.value(:options)]
+               '--title', @resource.value(:name)]
     if @resource.value(:initrd)
       options.push('--initrd', @resource.value(:initrd))
     end
     if @resource.value(:configfile)
       options.push('--config-file', @resource.value(:configfile))
+    end
+    if @resource.value(:options)
+      options.push('--args', @resource.value(:options))
     end
     grubby(*options)
   end
