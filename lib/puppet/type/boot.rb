@@ -9,33 +9,27 @@ Puppet::Type.newtype(:boot) do
   end
 
   newparam(:configfile) do
-    munge do |value|
-      path = Pathname.new(value)
-      unless path.absolute?
+    validate do |value|
+      unless Pathname.new(value).absolute?
         raise ArgumentError, "configfile must be an absolute path"
       end
-      path
     end
   end
 
   newparam(:kernel) do
     isrequired
-    munge do |value|
-      path = Pathname.new(value)
-      unless path.absolute?
+    validate do |value|
+      unless Pathname.new(value).absolute?
         raise ArgumentError, "kernel must be an absolute path"
       end
-      path
     end
   end
   
   newparam(:initrd) do
-    munge do |value|
-      path = Pathname.new(value)
-      unless path.absolute?
-        raise ArgumentError, "kernel must be an absolute path"
+    validate do |value|
+      unless Pathname.new(value).absolute?
+        raise ArgumentError, "initrd must be an absolute path"
       end
-      path
     end
   end
   

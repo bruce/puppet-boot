@@ -4,7 +4,8 @@ Puppet::Type.type(:boot).provide(:grubby) do
   
   def create
     options = ['--add-kernel', @resource.value(:kernel),
-               '--title', @resource.value(:name)]
+               '--title', @resource.value(:name),
+               ]
     if @resource.value(:initrd)
       options.push('--initrd', @resource.value(:initrd))
     end
@@ -16,7 +17,6 @@ Puppet::Type.type(:boot).provide(:grubby) do
     end
     grubby(*options)
   end
-
   def exists?
     record
   rescue Puppet::ExecutionFailure
@@ -31,7 +31,8 @@ Puppet::Type.type(:boot).provide(:grubby) do
 
   def record
     @record ||= records.detect do |record|
-      next unless record['kernel'] == @resource.value(:kernel)
+      kernel = @resource.value(:kernel).sub(/^\/boot/, '')
+      next unless record['kernel'] == kernel
       next unless record['initrd'] == @resource.value(:initrd)
       next unless record['args'] == @resource.value(:options)
       true
@@ -53,15 +54,20 @@ Puppet::Type.type(:boot).provide(:grubby) do
           current_index = value
         end
       when 'args'
-        args = args[1..-2]
+        value = value[1..-2]
       end
+      next sets if sets.empty?
       sets.last[key] = value
       sets
     end
   end
 
   def raw_info
-    grubby('--info', @resource.value(:kernel)).chomp
+    options = ['--info', @resource.value(:kernel)]
+    if @resource[:configfile]
+      options.push('--config-file', @resource.value(:configfile))
+    end
+    grubby(*options).chomp
   end
 
 end
